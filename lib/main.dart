@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ffi';
 import 'dart:isolate';
 import 'dart:ui';
+import 'package:background_location/http_service.dart';
 import 'package:background_locator/background_locator.dart';
 import 'package:background_locator/location_dto.dart';
 import 'package:background_locator/settings/android_settings.dart';
@@ -40,10 +41,10 @@ class _MyAppState extends State<MyApp> {
     IsolateNameServer.registerPortWithName(port.sendPort, LocationServiceRepository.isolateName);
 
     port.listen((dynamic data) async {
-      print('This is background location app ${i++}');
+      // print('This is background location app ${i++}');
       lastLocation2 = data;
       if(data != null) {
-        print('Latitude and longitude of location is ${lastLocation2.latitude} ${lastLocation2.longitude}');
+        // print('Latitude and longitude of location is ${lastLocation2.latitude} ${lastLocation2.longitude}');
       }
       await updateUI(data);
     });
@@ -56,9 +57,11 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> updateUI(LocationDto data) async {
+    print("Lattitude ${data.latitude} Longitude ${data.longitude}");
+    var response = await HttpService.sendLatLng(data.latitude.toString() , data.longitude.toString(), '874');
     final log = await FileManager.readLogFile();
 
-    await _updateNotificationText(data);
+    // await _updateNotificationText(data);
 
     setState(() {
       if (data != null) {
@@ -68,28 +71,28 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  Future<void> _updateNotificationText(LocationDto data) async {
-    if (data == null) {
-      return;
-    }
-
-    await BackgroundLocator.updateNotificationText(
-      title: "new location received",
-      msg: "${DateTime.now()}",
-      bigMsg: "${data.latitude}, ${data.longitude}"
-    );
-  }
+  // Future<void> _updateNotificationText(LocationDto data) async {
+  //   if (data == null) {
+  //     return;
+  //   }
+  //
+  //   await BackgroundLocator.updateNotificationText(
+  //     title: "new location received",
+  //     msg: "${DateTime.now()}",
+  //     bigMsg: "${data.latitude}, ${data.longitude}"
+  //   );
+  // }
 
   Future<void> initPlatformState() async {
-    print('Initializing...');
+    // print('Initializing...');
     await BackgroundLocator.initialize();
     logStr = await FileManager.readLogFile();
-    print('Initialization done');
+    // print('Initialization done');
     final _isRunning = await BackgroundLocator.isServiceRunning();
     setState(() {
       isRunning = _isRunning;
     });
-    print('Running ${isRunning.toString()}');
+    // print('Running ${isRunning.toString()}');
   }
 
   @override
@@ -149,7 +152,8 @@ class _MyAppState extends State<MyApp> {
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[start, stop, clear, status, log],
+              children: <Widget>[start, stop, clear, status, log,
+              ],
             ),
           ),
         ),
@@ -166,7 +170,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _onStart() async {
-    Timer.periodic(Duration(seconds: 3), (timer) { print('we register the app in flutter background'); });
+    Timer.periodic(Duration(seconds: 3), (timer) {
+      // print('we register the app in flutter background');
+    });
     if (await _checkLocationPermission()) {
       await _startLocator();
       final _isRunning = await BackgroundLocator.isServiceRunning();
@@ -204,7 +210,7 @@ class _MyAppState extends State<MyApp> {
       autoStop: false,
       androidSettings: const AndroidSettings(
         accuracy: LocationAccuracy.NAVIGATION,
-        interval: 5,
+        interval: 15,
         distanceFilter: 0,
         client: LocationClient.google,
         androidNotificationSettings: AndroidNotificationSettings(

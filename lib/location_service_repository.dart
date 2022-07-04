@@ -62,14 +62,12 @@ class LocationServiceRepository {
 
   static Future<void> setLogLabel(String label) async {
     final date = DateTime.now();
-    await FileManager.writeToLogFile(
-        '------------\n$label: ${formatDateLog(date)}\n------------\n');
+    // await FileManager.writeToLogFile('------------\n$label: ${formatDateLog(date)}\n------------\n');
   }
 
   static Future<void> setLogPosition(int count, LocationDto data) async {
     final date = DateTime.now();
-    await FileManager.writeToLogFile(
-        '$count : ${formatDateLog(date)} --> ${formatLog(data)} --- isMocked: ${data.isMocked}\n');
+    // await FileManager.writeToLogFile('$count : ${formatDateLog(date)} --> ${formatLog(data)} --- isMocked: ${data.isMocked}\n');
   }
 
   static double dp(double val, int places) {
